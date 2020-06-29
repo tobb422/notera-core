@@ -15,7 +15,13 @@ lazy val `applications-http` = (project in file("applications/http"))
   )
   .settings(coreSettings)
 
+lazy val domain = (project in file("modules/domain"))
+  .settings(
+    name := s"$baseName-domain"
+  )
+  .settings(coreSettings)
+
 lazy val root = (project in file("."))
   .settings(name := baseName)
   .settings(coreSettings)
-  .aggregate(`applications-http`)
+  .aggregate(`applications-http`, domain)

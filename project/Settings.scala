@@ -1,5 +1,5 @@
 import sbt.Keys._
-import sbt._
+import sbt.{Compile, _}
 
 object Settings {
   val coreSettings: Def.SettingsDefinition = Seq(
@@ -14,6 +14,10 @@ object Settings {
       "-language:implicitConversions",
       "-language:higherKinds",
       "-language:existentials"
+    ),
+    Compile / console / scalacOptions --= Seq(
+      "-Xfatal-warnings",
+      "-Xlint"
     )
   )
 }
