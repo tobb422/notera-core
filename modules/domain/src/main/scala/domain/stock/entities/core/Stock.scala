@@ -1,4 +1,4 @@
-package domain.stock.entities
+package domain.stock.entities.core
 
 import java.time.ZonedDateTime
 
@@ -6,7 +6,7 @@ import shared.ddd.{Entity, Identifier}
 
 case class Stock(
   id: Stock.Id,
-  itemId: StockItem.Id,
+  item: StockItem,
   tags: List[Tag.Id],
   createdAt: ZonedDateTime,
   updatedAt: ZonedDateTime

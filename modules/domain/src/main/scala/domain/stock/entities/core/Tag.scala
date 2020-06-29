@@ -1,4 +1,4 @@
-package domain.stock.entities
+package domain.stock.entities.core
 
 import java.time.ZonedDateTime
 
