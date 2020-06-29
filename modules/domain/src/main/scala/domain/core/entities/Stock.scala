@@ -1,22 +1,21 @@
-package domain.stock.entities.core
+package domain.core.entities
 
 import java.time.ZonedDateTime
 
 import shared.ddd.{Entity, Identifier}
 
-case class Tag(
-  id: Tag.Id,
-  name: String,
-  color: Tag.Color,
+case class Stock(
+  id: Stock.Id,
+  item: StockItem,
+  tags: List[Tag.Id],
   createdAt: ZonedDateTime,
   updatedAt: ZonedDateTime
 ) extends Entity {
-  override type Id = Tag.Id
+  override type Id = Stock.Id
 }
 
-object Tag {
+object Stock {
   case class Id(value: String) extends Identifier {
     override type IdType = String
   }
-  case class Color(value: String)
 }

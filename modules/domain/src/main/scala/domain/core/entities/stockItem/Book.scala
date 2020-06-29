@@ -1,7 +1,7 @@
 package domain.stock.entities.core.stockItem
 
-import domain.stock.entities.common.Url
-import domain.stock.entities.core.StockItem
+import domain.common.entities.Url
+import domain.core.entities.StockItem
 
 case class Book(
   title: String,
