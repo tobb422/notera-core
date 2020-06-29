@@ -16,10 +16,6 @@ lazy val `applications-http` = (project in file("applications/http"))
   .settings(coreSettings)
 
 lazy val root = (project in file("."))
-  .settings(
-    name := baseName
-  )
+  .settings(name := baseName)
   .settings(coreSettings)
-  .aggregate(
-    `applications-http`
-  )
+  .aggregate(`applications-http`)
