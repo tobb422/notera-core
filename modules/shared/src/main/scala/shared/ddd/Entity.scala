@@ -13,3 +13,7 @@ trait Identifier {
   type IdType
   val value: IdType
 }
+
+trait IdGenerator[T] {
+  def generate(): T
+}
