@@ -13,7 +13,8 @@ lazy val domain = (project in file("modules/domain"))
 
 lazy val shared = (project in file("modules/shared"))
   .settings(
-    name := s"$baseName-shared"
+    name := s"$baseName-shared",
+    libraryDependencies ++= Seq(ULID.ulid4s)
   )
   .settings(coreSettings)
 

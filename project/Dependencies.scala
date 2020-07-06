@@ -7,6 +7,10 @@ object Http4s {
 }
 
 object Logback {
-  val version = "1.2.3"
-  val classic = "ch.qos.logback" % "logback-classic" % version
+  val ver = "1.2.3"
+  val classic = "ch.qos.logback" % "logback-classic" % ver
+}
+
+object ULID {
+  val ulid4s = "net.petitviolet" %% "ulid4s" % "0.4.0"
 }
