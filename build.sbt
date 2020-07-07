@@ -4,6 +4,12 @@ ThisBuild / scalaVersion := "2.13.1"
 
 val baseName = "notera-core"
 
+lazy val shared = (project in file("modules/shared"))
+  .settings(
+    name := s"$baseName-shared"
+  )
+  .settings(coreSettings)
+
 lazy val domain = (project in file("modules/domain"))
   .settings(
     name := s"$baseName-domain"
@@ -11,14 +17,15 @@ lazy val domain = (project in file("modules/domain"))
   .settings(coreSettings)
   .dependsOn(shared)
 
-lazy val shared = (project in file("modules/shared"))
+lazy val gateway = (project in file("modules/gateway"))
   .settings(
-    name := s"$baseName-shared",
+    name := s"$baseName-gateway",
     libraryDependencies ++= Seq(ULID.ulid4s)
   )
   .settings(coreSettings)
+  .dependsOn(domain)
 
 lazy val root = (project in file("."))
   .settings(name := baseName)
   .settings(coreSettings)
-  .aggregate(domain, shared)
+  .aggregate(domain, shared, gateway)
