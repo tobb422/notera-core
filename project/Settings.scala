@@ -18,6 +18,7 @@ object Settings {
     Compile / console / scalacOptions --= Seq(
       "-Xfatal-warnings",
       "-Xlint"
-    )
+    ),
+    libraryDependencies += TestLib.scalaTest % Test
   )
 }

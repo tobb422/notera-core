@@ -14,3 +14,7 @@ object Logback {
 object ULID {
   val ulid4s = "net.petitviolet" %% "ulid4s" % "0.4.0"
 }
+
+object TestLib {
+  val scalaTest = "org.scalatest" %% "scalatest" % "3.2.0"
+}
