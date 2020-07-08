@@ -25,7 +25,19 @@ lazy val gateway = (project in file("modules/gateway"))
   .settings(coreSettings)
   .dependsOn(domain)
 
+lazy val http = (project in file("modules/http"))
+  .settings(
+    name := s"$baseName-http",
+    libraryDependencies ++= Seq(
+      Http4s.dsl,
+      Http4s.blazeServer,
+      Logback.classic
+    )
+  )
+  .settings(coreSettings)
+  .dependsOn(gateway)
+
 lazy val root = (project in file("."))
   .settings(name := baseName)
   .settings(coreSettings)
-  .aggregate(domain, shared, gateway)
+  .aggregate(domain, shared, gateway, http)
