@@ -1,11 +1,10 @@
 package http
 
-import cats.effect.{ContextShift, ExitCode, IO, Timer}
-import cats.implicits._
-import org.http4s.HttpRoutes
-import org.http4s.dsl.io._
-import org.http4s.implicits._
-import org.http4s.server.blaze.BlazeServerBuilder
+import cats.effect.{ContextShift, IO, Timer}
+import http.http4s.Http4sServer
+
+import gateway.id.ULIDGenerator
+import shared.ddd.IdGenerator
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -13,16 +12,8 @@ object Main extends App {
   implicit val cs: ContextShift[IO] = IO.contextShift(global)
   implicit val timer: Timer[IO]     = IO.timer(global)
 
-  val helloWorldService = HttpRoutes.of[IO] {
-    case GET -> Root / "hello" / name => Ok(s"Hello, $name.")
-  }.orNotFound
+  implicit val idGen: IdGenerator[String] = new ULIDGenerator
 
-  BlazeServerBuilder[IO]
-    .bindHttp(8080, "0.0.0.0")
-    .withHttpApp(helloWorldService)
-    .serve
-    .compile
-    .drain
-    .as(ExitCode.Success)
-    .unsafeRunSync()
+  val server: Server[IO] = new Http4sServer[IO]
+  server.serve("0.0.0.0", 8080).unsafeRunSync()
 }
