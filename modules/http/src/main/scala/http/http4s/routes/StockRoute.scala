@@ -1,44 +1,51 @@
-package http.http4s.route
+package http.http4s.routes
 
-import cats.effect.ConcurrentEffect
+import cats.effect._
 import cats.implicits._
-import cats.Applicative
+import fs2.Stream
+import fs2.text.utf8Encode
 import org.http4s._
 import org.http4s.dsl.io._
 
-class StockService[F[_]: ConcurrentEffect] {
-  private val getStocks = {
+import http.controllers.StockService
+
+class StockRoute[F[_]: ConcurrentEffect] {
+  private val service = new StockService[F]
+
+  private val getStocks =
     HttpRoutes.of[F] {
       case GET -> Root / "stocks" =>
-        Applicative.apply[F].pure(Response[F](Ok))
+        service.getStocks.map {
+          case Left(_) => Response(BadRequest)
+          case Right(res) => Response(Ok, body = Stream(res).through(utf8Encode))
+        }
     }
-  }
 
   private val getStock = {
     HttpRoutes.of[F] {
       case GET -> Root / "stocks" / IntVar(id) =>
-        Applicative.apply[F].pure(Response[F](Ok))
+        Response[F](Ok).pure[F]
     }
   }
 
   private val postStock = {
     HttpRoutes.of[F] {
       case POST -> Root / "stock" =>
-        Applicative.apply[F].pure(Response[F](Created))
+        Response[F](Created).pure[F]
     }
   }
 
   private val putStock = {
     HttpRoutes.of[F] {
       case PUT -> Root / "stocks" / IntVar(id) =>
-        Applicative.apply[F].pure(Response[F](Ok))
+        Response[F](Ok).pure[F]
     }
   }
 
   private val deleteStock = {
     HttpRoutes.of[F] {
       case DELETE -> Root / "stocks" / IntVar(id) =>
-        Applicative.apply[F].pure(Response[F](NoContent))
+        Response[F](NoContent).pure[F]
     }
   }
 

@@ -3,10 +3,10 @@ package http.http4s
 import cats.effect.ConcurrentEffect
 import org.http4s._
 
-import http.http4s.route.StockService
+import http.http4s.routes.StockRoute
 
 class Http4sService[F[_]: ConcurrentEffect] {
-  private val stockService = new StockService[F]
+  private val stock = new StockRoute[F]
 
-  val routes: HttpRoutes[F] = stockService.routes
+  val routes: HttpRoutes[F] = stock.routes
 }
