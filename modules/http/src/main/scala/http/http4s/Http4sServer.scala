@@ -3,13 +3,24 @@ package http.http4s
 import cats.effect.{ConcurrentEffect, ContextShift, ExitCode, Timer}
 import cats.implicits._
 import org.http4s.implicits._
+import org.http4s.Header
 import org.http4s.server.blaze.BlazeServerBuilder
 
-class Http4sServer[F[_]: ContextShift: ConcurrentEffect: Timer] extends http.Server[F] {
+import domain.core.repositories.StockRepository
+
+class Http4sServer[F[_]: ContextShift: ConcurrentEffect: Timer: StockRepository] extends http.Server[F] {
   override def serve(host: String, port: Int): F[_] = {
+    val services =
+      new Http4sService[F].routes.map(
+        _.putHeaders(
+          Header("Content-Type", "application/json"),
+          Header("charset", "UTF-8")
+        )
+      )
+
     BlazeServerBuilder[F]
       .bindHttp(port, host)
-      .withHttpApp(new Http4sService[F].routes.orNotFound)
+      .withHttpApp(services.orNotFound)
       .serve
       .compile
       .drain

@@ -20,7 +20,11 @@ lazy val domain = (project in file("modules/domain"))
 lazy val gateway = (project in file("modules/gateway"))
   .settings(
     name := s"$baseName-gateway",
-    libraryDependencies ++= Seq(ULID.ulid4s)
+    libraryDependencies ++= Seq(
+      ULID.ulid4s,
+      Cats.core,
+      Cats.effect
+    )
   )
   .settings(coreSettings)
   .dependsOn(domain)
@@ -31,7 +35,10 @@ lazy val http = (project in file("modules/http"))
     libraryDependencies ++= Seq(
       Http4s.dsl,
       Http4s.blazeServer,
-      Logback.classic
+      Logback.classic,
+      Circe.core,
+      Circe.parser,
+      Circe.generic
     )
   )
   .settings(coreSettings)

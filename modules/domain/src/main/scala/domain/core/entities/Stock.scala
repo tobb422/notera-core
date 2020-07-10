@@ -7,7 +7,7 @@ import shared.ddd.{Entity, IdGenerator, Identifier}
 case class Stock(
   id: Stock.Id,
   item: StockItem,
-  tags: List[Tag.Id],
+  tags: List[Tag],
   createdAt: ZonedDateTime,
   updatedAt: ZonedDateTime
 ) extends Entity {

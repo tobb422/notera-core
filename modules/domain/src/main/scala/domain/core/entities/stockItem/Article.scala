@@ -1,4 +1,4 @@
-package domain.stock.entities.core.stockItem
+package domain.core.entities.stockItem
 
 import domain.common.entities.Url
 import domain.core.entities.StockItem
