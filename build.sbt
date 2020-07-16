@@ -33,6 +33,7 @@ lazy val http = (project in file("modules/http"))
   .settings(
     name := s"$baseName-http",
     libraryDependencies ++= Seq(
+      Http4s.circe,
       Http4s.dsl,
       Http4s.blazeServer,
       Logback.classic,

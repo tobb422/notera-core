@@ -2,6 +2,7 @@ import sbt._
 
 object Http4s {
   private val ver = "0.21.3"
+  val circe = "org.http4s" %% "http4s-circe" % ver
   val dsl = "org.http4s" %% "http4s-dsl" % ver
   val blazeServer = "org.http4s" %% "http4s-blaze-server" % ver
 }

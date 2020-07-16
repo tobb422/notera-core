@@ -1,29 +1,42 @@
 package http.controllers
 
 import scala.util.Either
-
 import cats.Monad
 import cats.data.EitherT
-
 import domain.core.entities.Stock
 import domain.core.repositories.StockRepository
-import http.presenter.stock.GetStockResponse
+import http.presenter.stock.{PostStockRequest, StockResponse}
+import shared.ddd.IdGenerator
 
 
-class StockService[F[_]: Monad: StockRepository] {
-  def getStocks: F[Either[String, List[GetStockResponse]]] = {
+class StockService[F[_]: Monad: StockRepository](
+  implicit val idGen: IdGenerator[String]
+) {
+  def getStocks: F[Either[String, List[StockResponse]]] = {
     val result = for {
       stocks <- EitherT.right[String](StockRepository[F].list)
-    } yield stocks.map(GetStockResponse.fromEntity)
+    } yield stocks.map(StockResponse.fromEntity)
 
     result.value
   }
 
-  def getStock(id: String): F[Either[String, GetStockResponse]] = {
+  def getStock(id: String): F[Either[String, StockResponse]] = {
     val result = for {
       stock <- EitherT(StockRepository[F].resolve(Stock.Id(id)))
-    } yield GetStockResponse.fromEntity(stock)
+    } yield StockResponse.fromEntity(stock)
 
     result.value
   }
+
+  def postStock(req: PostStockRequest): F[Either[String, StockResponse]] = {
+    val result = for {
+      newStock <- EitherT.fromEither[F](Right[String, Stock](req.toEntity))
+      stock <- EitherT.right[String](StockRepository[F].save(newStock))
+    } yield StockResponse.fromEntity(stock)
+
+    result.value
+  }
+
+  def deleteStock(id: String): F[Either[String, Unit]] =
+    StockRepository[F].delete(Stock.Id(id))
 }

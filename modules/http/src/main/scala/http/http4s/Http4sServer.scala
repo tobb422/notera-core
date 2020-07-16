@@ -5,10 +5,12 @@ import cats.implicits._
 import org.http4s.implicits._
 import org.http4s.Header
 import org.http4s.server.blaze.BlazeServerBuilder
-
 import domain.core.repositories.StockRepository
+import shared.ddd.IdGenerator
 
-class Http4sServer[F[_]: ContextShift: ConcurrentEffect: Timer: StockRepository] extends http.Server[F] {
+class Http4sServer[F[_]: ContextShift: ConcurrentEffect: Timer: StockRepository](
+  implicit idGen: IdGenerator[String]
+) extends http.Server[F] {
   override def serve(host: String, port: Int): F[_] = {
     val services =
       new Http4sService[F].routes.map(

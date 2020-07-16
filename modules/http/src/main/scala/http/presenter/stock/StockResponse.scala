@@ -8,7 +8,7 @@ import io.circe.generic.semiauto._
 import domain.core.entities.Stock
 import http.presenter.stock.resources.TagResource
 
-case class GetStockResponse(
+case class StockResponse(
   id: String,
   title: String,
   url: String,
@@ -18,11 +18,11 @@ case class GetStockResponse(
   updatedAt: ZonedDateTime
 )
 
-object GetStockResponse {
-  implicit val encoder: Encoder[GetStockResponse] = deriveEncoder
+object StockResponse {
+  implicit val encoder: Encoder[StockResponse] = deriveEncoder
 
-  def fromEntity(stock: Stock): GetStockResponse = {
-    GetStockResponse(
+  def fromEntity(stock: Stock): StockResponse = {
+    StockResponse(
       stock.id.value,
       stock.item.title,
       stock.item.url.value,

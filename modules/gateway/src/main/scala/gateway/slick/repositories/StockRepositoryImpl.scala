@@ -33,4 +33,10 @@ class StockRepositoryImpl[F[_]: Monad] extends StockRepository[F] {
 
   def list: F[List[Stock]] =
     Monad.apply[F].pure(List(tmpStock))
+
+  def save(value: Stock): F[Stock] =
+    Monad.apply[F].pure(value)
+
+  def delete(id: Stock.Id): F[Either[String, Unit]] =
+    Monad.apply[F].pure(Right[String, Unit](()))
 }
