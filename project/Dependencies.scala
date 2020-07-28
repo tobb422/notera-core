@@ -32,3 +32,8 @@ object Cats {
   val core = "org.typelevel" %% "cats-core" % "2.0.0"
   val effect = "org.typelevel" %% "cats-effect" % "2.1.3"
 }
+
+object Slick {
+  val slick = "com.typesafe.slick" %% "slick" % "3.3.2"
+  val slf4j = "org.slf4j" % "slf4j-nop" % "1.6.4"
+}

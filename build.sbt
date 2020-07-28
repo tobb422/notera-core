@@ -23,7 +23,9 @@ lazy val gateway = (project in file("modules/gateway"))
     libraryDependencies ++= Seq(
       ULID.ulid4s,
       Cats.core,
-      Cats.effect
+      Cats.effect,
+      Slick.slick,
+      Slick.slf4j
     )
   )
   .settings(coreSettings)
