@@ -1,4 +1,4 @@
-create table Stock (
+create table stocks (
     id varchar(26) PRIMARY KEY,
     title text NOT NULL,
     url text NOT NULL,
