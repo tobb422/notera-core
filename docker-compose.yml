@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  db:
+    container_name: database
+    image: postgres:11
+    environment:
+      POSTGRES_USER: notera
+      POSTGRES_PASSWORD: password
+      POSTGRES_ROOT_PASSWORD: password
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data
+    networks:
+      - notera
+
+  data:
+    container_name: data
+    image: busybox
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - notera
+
+volumes:
+  db_data:
+
+networks:
+  notera:
+    external: true
