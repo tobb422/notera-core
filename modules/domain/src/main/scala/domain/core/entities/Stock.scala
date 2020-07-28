@@ -2,10 +2,12 @@ package domain.core.entities
 
 import java.time.ZonedDateTime
 
+import domain.support.entities.User
 import shared.ddd.{Entity, IdGenerator, Identifier}
 
 case class Stock(
   id: Stock.Id,
+  userId: User.Id,
   item: StockItem,
   tags: List[Tag],
   createdAt: ZonedDateTime,
@@ -23,8 +25,9 @@ object Stock {
       Id(idGen.generate())
   }
 
-  def from(item: StockItem)(implicit idGen: IdGenerator[String]): Stock = Stock(
+  def from(uid: User.Id, item: StockItem)(implicit idGen: IdGenerator[String]): Stock = Stock(
     id = Id.getNextId(),
+    userId = uid,
     item = item,
     tags = List(),
     createdAt = ZonedDateTime.now(),

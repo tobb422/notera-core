@@ -23,7 +23,7 @@ class StockRoute[F[_]: ConcurrentEffect: StockRepository](
   private val getStocks =
     HttpRoutes.of[F] {
       case GET -> Root / "stocks" =>
-        service.getStocks.map {
+        service.getStocks("uid").map {
           case Left(res) => Response(BadRequest, body = Stream(res).through(utf8Encode))
           case Right(res) => Response(Ok, body = Stream(res.asJson.spaces2).through(utf8Encode))
         }
@@ -32,7 +32,7 @@ class StockRoute[F[_]: ConcurrentEffect: StockRepository](
   private val getStock = {
     HttpRoutes.of[F] {
       case GET -> Root / "stocks" / id =>
-        service.getStock(id).map {
+        service.getStock(id, "uid").map {
           case Left(res) => Response(BadRequest, body = Stream(res).through(utf8Encode))
           case Right(res) => Response(Ok, body = Stream(res.asJson.spaces2).through(utf8Encode))
         }

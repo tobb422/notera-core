@@ -5,6 +5,7 @@ import cats.Monad
 import cats.data.EitherT
 import domain.core.entities.Stock
 import domain.core.repositories.StockRepository
+import domain.support.entities.User
 import http.presenter.stock.{PostStockRequest, StockResponse}
 import shared.ddd.IdGenerator
 
@@ -12,17 +13,17 @@ import shared.ddd.IdGenerator
 class StockService[F[_]: Monad: StockRepository](
   implicit val idGen: IdGenerator[String]
 ) {
-  def getStocks: F[Either[String, List[StockResponse]]] = {
+  def getStocks(uid: String): F[Either[String, List[StockResponse]]] = {
     val result = for {
-      stocks <- EitherT.right[String](StockRepository[F].list)
+      stocks <- EitherT.right[String](StockRepository[F].list(User.Id(uid)))
     } yield stocks.map(StockResponse.fromEntity)
 
     result.value
   }
 
-  def getStock(id: String): F[Either[String, StockResponse]] = {
+  def getStock(id: String, uid: String): F[Either[String, StockResponse]] = {
     val result = for {
-      stock <- EitherT(StockRepository[F].resolve(Stock.Id(id)))
+      stock <- EitherT(StockRepository[F].resolve(Stock.Id(id), User.Id(uid)))
     } yield StockResponse.fromEntity(stock)
 
     result.value
@@ -31,7 +32,7 @@ class StockService[F[_]: Monad: StockRepository](
   def postStock(req: PostStockRequest): F[Either[String, StockResponse]] = {
     val result = for {
       newStock <- EitherT.fromEither[F](Right[String, Stock](req.toEntity))
-      stock <- EitherT.right[String](StockRepository[F].save(newStock))
+      stock <- EitherT(StockRepository[F].save(newStock))
     } yield StockResponse.fromEntity(stock)
 
     result.value
