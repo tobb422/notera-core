@@ -35,5 +35,7 @@ object Cats {
 
 object Slick {
   val slick = "com.typesafe.slick" %% "slick" % "3.3.2"
+  val slickHikariCP = "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2"
   val slf4j = "org.slf4j" % "slf4j-nop" % "1.6.4"
+  val pg = "org.postgresql" % "postgresql" % "42.2.5"
 }

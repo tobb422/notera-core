@@ -2,12 +2,17 @@ package domain.core.repositories
 
 import domain.core.entities.Stock
 import domain.support.entities.User
+import shared.ddd._
 
 trait StockRepository[F[_]] {
-  def resolve(id: Stock.Id, uid: User.Id): F[Either[String, Stock]]
-  def list(uid: User.Id): F[List[Stock]]
-  def save(value: Stock): F[Either[String, Stock]]
-  def delete(id: Stock.Id): F[Either[String, Unit]]
+  type FailedToResolveByStockId = FailedToResolveById[Stock]
+  type FailedToSaveStock = FailedToSaveEntity[Stock]
+  type FailedToDeleteStock = FailedToDeleteEntity[Stock]
+
+  def resolve(id: Stock.Id, uid: User.Id): F[Either[FailedToResolveByStockId, Stock]]
+  def list(uid: User.Id): F[Seq[Stock]]
+  def save(value: Stock): F[Either[FailedToSaveStock, Stock]]
+  def delete(id: Stock.Id): F[Either[FailedToDeleteStock, Unit]]
 }
 
 object StockRepository {

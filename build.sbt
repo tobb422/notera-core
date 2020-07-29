@@ -25,7 +25,9 @@ lazy val gateway = (project in file("modules/gateway"))
       Cats.core,
       Cats.effect,
       Slick.slick,
-      Slick.slf4j
+      Slick.slickHikariCP,
+      Slick.slf4j,
+      Slick.pg
     )
   )
   .settings(coreSettings)

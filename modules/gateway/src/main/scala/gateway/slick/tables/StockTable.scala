@@ -1,6 +1,7 @@
 package gateway.slick.tables
 
-import java.time.ZonedDateTime
+import java.sql.Timestamp
+import java.time.ZoneId
 
 import slick.jdbc.JdbcProfile
 import domain.core.entities.{Stock, StockItem}
@@ -20,8 +21,8 @@ protected[slick] class StockTable(val jdbcProfile: JdbcProfile) extends SlickTab
     def title = column[String]("title")
     def url = column[String]("url")
     def image = column[String]("image")
-    def createdAt = column[ZonedDateTime]("created_at")
-    def updatedAt = column[ZonedDateTime]("updated_at")
+    def createdAt = column[Timestamp]("created_at")
+    def updatedAt = column[Timestamp]("updated_at")
 
     def * : ProvenShape[Stock] =
       (id, userId, (title, url, image), createdAt, updatedAt).shaped <> (
@@ -32,8 +33,8 @@ protected[slick] class StockTable(val jdbcProfile: JdbcProfile) extends SlickTab
               User.Id(userId),
               StockItem(item._1, Url(item._2), Url(item._3)),
               List(),
-              createdAt,
-              updatedAt
+              createdAt.toLocalDateTime.atZone(ZoneId.of("Asia/Tokyo")),
+              updatedAt.toLocalDateTime.atZone(ZoneId.of("Asia/Tokyo"))
             )
         },
         {
@@ -43,8 +44,8 @@ protected[slick] class StockTable(val jdbcProfile: JdbcProfile) extends SlickTab
                 s.id.value,
                 s.userId.value,
                 (s.item.title, s.item.url.value, s.item.image.value),
-                s.createdAt,
-                s.updatedAt
+                Timestamp.valueOf(s.createdAt.toLocalDateTime),
+                Timestamp.valueOf(s.updatedAt.toLocalDateTime),
               )
             )
         }

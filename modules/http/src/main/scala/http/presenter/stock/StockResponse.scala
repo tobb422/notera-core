@@ -2,14 +2,12 @@ package http.presenter.stock
 
 import java.time.ZonedDateTime
 
-import io.circe.Encoder
-import io.circe.generic.semiauto._
-
 import domain.core.entities.Stock
 import http.presenter.stock.resources.TagResource
 
 case class StockResponse(
   id: String,
+  uid: String,
   title: String,
   url: String,
   image: String,
@@ -19,11 +17,10 @@ case class StockResponse(
 )
 
 object StockResponse {
-  implicit val encoder: Encoder[StockResponse] = deriveEncoder
-
   def fromEntity(stock: Stock): StockResponse = {
     StockResponse(
       stock.id.value,
+      stock.userId.value,
       stock.item.title,
       stock.item.url.value,
       stock.item.image.value,
