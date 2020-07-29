@@ -26,4 +26,14 @@ object Tag {
   }
 
   case class Color(value: String)
+
+  def from(uid: User.Id, name: String, color: String)(implicit idGen: IdGenerator[String]): Tag =
+    Tag(
+      id = Id.getNextId(),
+      userId = uid,
+      name = name,
+      color = Color(color),
+      createdAt = ZonedDateTime.now(),
+      updatedAt = ZonedDateTime.now()
+    )
 }

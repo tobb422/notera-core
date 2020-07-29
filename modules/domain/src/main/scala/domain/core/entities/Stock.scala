@@ -9,7 +9,7 @@ case class Stock(
   id: Stock.Id,
   userId: User.Id,
   item: StockItem,
-  tags: List[Tag],
+  tags: Seq[Tag],
   createdAt: ZonedDateTime,
   updatedAt: ZonedDateTime
 ) extends Entity {
@@ -29,7 +29,7 @@ object Stock {
     id = Id.getNextId(),
     userId = uid,
     item = item,
-    tags = List(),
+    tags = Seq(),
     createdAt = ZonedDateTime.now(),
     updatedAt = ZonedDateTime.now()
   )

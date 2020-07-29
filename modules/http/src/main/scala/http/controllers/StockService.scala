@@ -14,40 +14,40 @@ class StockService[F[_]: Monad: StockRepository](
   implicit val idGen: IdGenerator[String]
 ) {
   def getStocks(uid: String): F[Either[APIError, StocksResponse]] = {
-    val result = for {
+    val res = for {
       stocks <- EitherT.right[APIError](StockRepository[F].list(User.Id(uid)))
     } yield StocksResponse(stocks.map(StockResponse.fromEntity))
 
-    result.value
+    res.value
   }
 
   def getStock(id: String, uid: String): F[Either[APIError, StockResponse]] = {
-    val result = for {
+    val res = for {
       stock <- EitherT(
         StockRepository[F].resolve(Stock.Id(id), User.Id(uid))
       ).leftMap(e => NotFound(e.getMessage): APIError)
     } yield StockResponse.fromEntity(stock)
 
-    result.value
+    res.value
   }
 
   def postStock(req: PostStockRequest, uid: String): F[Either[APIError, StockResponse]] = {
-    val result = for {
+    val res = for {
       stock <- EitherT(
         StockRepository[F].save(req.toEntity(uid))
       ).leftMap(e => BadRequest(e.getMessage): APIError)
     } yield StockResponse.fromEntity(stock)
 
-    result.value
+    res.value
   }
 
   def deleteStock(id: String): F[Either[APIError, Unit]] = {
-    val result = for {
+    val res = for {
       _ <- EitherT(
         StockRepository[F].delete(Stock.Id(id))
       ).leftMap(e => BadRequest(e.getMessage): APIError)
     } yield ()
 
-    result.value
+    res.value
   }
 }
