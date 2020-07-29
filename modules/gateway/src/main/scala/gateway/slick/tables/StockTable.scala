@@ -45,7 +45,7 @@ protected[slick] class StockTable(val jdbcProfile: JdbcProfile) extends SlickTab
                 s.userId.value,
                 (s.item.title, s.item.url.value, s.item.image.value),
                 Timestamp.valueOf(s.createdAt.toLocalDateTime),
-                Timestamp.valueOf(s.updatedAt.toLocalDateTime),
+                Timestamp.valueOf(s.updatedAt.toLocalDateTime)
               )
             )
         }
