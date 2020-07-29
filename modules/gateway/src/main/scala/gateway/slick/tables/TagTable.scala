@@ -38,12 +38,14 @@ protected[slick] class TagTable(val jdbcProfile: JdbcProfile) extends SlickTable
         {
           t: DTag =>
             Some(
-              t.id.value,
-              t.userId.value,
-              t.name,
-              t.color.value,
-              Timestamp.valueOf(t.createdAt.toLocalDateTime),
-              Timestamp.valueOf(t.updatedAt.toLocalDateTime)
+              (
+                t.id.value,
+                t.userId.value,
+                t.name,
+                t.color.value,
+                Timestamp.valueOf(t.createdAt.toLocalDateTime),
+                Timestamp.valueOf(t.updatedAt.toLocalDateTime)
+              )
             )
         }
       )
