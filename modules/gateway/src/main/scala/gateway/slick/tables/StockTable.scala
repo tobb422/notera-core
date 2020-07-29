@@ -32,7 +32,7 @@ protected[slick] class StockTable(val jdbcProfile: JdbcProfile) extends SlickTab
               Stock.Id(id),
               User.Id(userId),
               StockItem(item._1, Url(item._2), Url(item._3)),
-              List(),
+              Seq(),
               createdAt.toLocalDateTime.atZone(ZoneId.of("Asia/Tokyo")),
               updatedAt.toLocalDateTime.atZone(ZoneId.of("Asia/Tokyo"))
             )

@@ -14,6 +14,9 @@ case class Stock(
   updatedAt: ZonedDateTime
 ) extends Entity {
   override type Id = Stock.Id
+
+  def mergeTags(tags: Seq[Tag]): Stock =
+    copy(tags = tags)
 }
 
 object Stock {
