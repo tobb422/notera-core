@@ -28,11 +28,11 @@ object Stock {
       Id(idGen.generate())
   }
 
-  def from(uid: User.Id, item: StockItem)(implicit idGen: IdGenerator[String]): Stock = Stock(
+  def from(uid: User.Id, item: StockItem, tags: Seq[Tag] = Seq.empty[Tag])(implicit idGen: IdGenerator[String]): Stock = Stock(
     id = Id.getNextId(),
     userId = uid,
     item = item,
-    tags = Seq(),
+    tags = tags,
     createdAt = ZonedDateTime.now(),
     updatedAt = ZonedDateTime.now()
   )

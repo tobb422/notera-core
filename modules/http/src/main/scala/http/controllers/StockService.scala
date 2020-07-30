@@ -34,7 +34,7 @@ class StockService[F[_]: Monad: StockRepository](
   def postStock(req: PostStockRequest, uid: String): F[Either[APIError, StockResponse]] = {
     val res = for {
       stock <- EitherT(
-        StockRepository[F].save(req.toEntity(uid))
+        StockRepository[F].save(req.toStockEntity(uid), req.toTagIdsEntity)
       ).leftMap(e => BadRequest(e.getMessage): APIError)
     } yield StockResponse.fromEntity(stock)
 

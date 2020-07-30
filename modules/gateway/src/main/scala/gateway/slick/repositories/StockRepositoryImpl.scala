@@ -1,5 +1,8 @@
 package gateway.slick.repositories
 
+import java.time.ZonedDateTime
+
+import cats._
 import cats.implicits._
 import cats.{Monad, ~>}
 import slick.dbio.DBIO
@@ -7,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import domain.core.entities._
 import domain.core.repositories.StockRepository
 import domain.support.entities.User
-import gateway.slick.tables.{StockTable, StockTagTable, TagTable}
+import gateway.slick.tables.{StockTable, StockTag, StockTagTable, TagTable}
 import shared.ddd.{FailedToDeleteEntity, FailedToResolveById, FailedToSaveEntity}
 
 import scala.util.{Failure, Success}
@@ -50,11 +53,16 @@ class StockRepositoryImpl[F[_]: Monad](
     execute.apply(res)
   }
 
-  override def save(value: Stock): F[Either[FailedToSaveStock, Stock]] = {
-    val res = stocks.insertOrUpdate(value).asTry.map {
-      case Success(_) => value.asRight
+  override def save(stock: Stock, tagIds: Seq[Tag.Id] = Seq.empty[Tag.Id]): F[Either[FailedToSaveStock, Stock]] = {
+    val res = (for {
+      _ <- stocks += stock
+      _ <- stockTags ++= (for { id <- tagIds } yield StockTag(stock.id.value, id.value, ZonedDateTime.now()))
+      t <- tags.filter(_.id inSet tagIds.map(_.value)).result
+    } yield t).asTry.map {
+      case Success(tag) => stock.mergeTags(for (t <- tag) yield t).asRight
       case Failure(e) => FailedToSaveEntity[Stock](message = Option(e.getMessage)).asLeft
     }
+
     execute.apply(res)
   }
 

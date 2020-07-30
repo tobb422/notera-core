@@ -1,6 +1,6 @@
 package domain.core.repositories
 
-import domain.core.entities.Stock
+import domain.core.entities.{Stock, Tag}
 import domain.support.entities.User
 import shared.ddd._
 
@@ -11,7 +11,7 @@ trait StockRepository[F[_]] {
 
   def resolve(id: Stock.Id, uid: User.Id): F[Either[FailedToResolveByStockId, Stock]]
   def list(uid: User.Id): F[Seq[Stock]]
-  def save(value: Stock): F[Either[FailedToSaveStock, Stock]]
+  def save(value: Stock, tagsId: Seq[Tag.Id] = Seq.empty[Tag.Id]): F[Either[FailedToSaveStock, Stock]]
   def delete(id: Stock.Id): F[Either[FailedToDeleteStock, Unit]]
 }
 

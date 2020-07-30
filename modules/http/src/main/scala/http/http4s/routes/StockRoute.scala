@@ -35,12 +35,10 @@ class StockRoute[F[_]: Sync: ConcurrentEffect: StockRepository](
       }
 
     case req @ POST -> Root / "stock" =>
-      val result = for {
+      (for {
         r <- req.as[PostStockRequest]
         stock <- service.postStock(r, tmpUid)
-      } yield stock
-
-      result.flatMap {
+      } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Created(res.asJson)
       }
