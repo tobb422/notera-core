@@ -9,7 +9,7 @@ import org.http4s.circe._
 import domain.core.repositories.TagRepository
 import http.controllers.TagService
 import http.http4s.routes.error.ErrorHandling
-import http.presenter.stock.PostTagRequest
+import http.presenter.tag.PostTagRequest
 import org.http4s.EntityDecoder
 import org.http4s.dsl.Http4sDsl
 import shared.ddd.IdGenerator

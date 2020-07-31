@@ -6,7 +6,7 @@ import domain.core.entities.Tag
 import domain.core.repositories.TagRepository
 import domain.support.entities.User
 import http.controllers.error.{APIError, BadRequest, NotFound}
-import http.presenter.stock.{PostTagRequest, TagResponse, TagsResponse}
+import http.presenter.tag.{PostTagRequest, TagResponse, TagsResponse}
 import shared.ddd.IdGenerator
 
 class TagService[F[_]: Monad: TagRepository](

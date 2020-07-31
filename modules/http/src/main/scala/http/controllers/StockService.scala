@@ -4,13 +4,13 @@ import scala.util.Either
 import cats.Monad
 import cats.data.EitherT
 import domain.core.entities.Stock
-import domain.core.repositories.StockRepository
+import domain.core.repositories.{StockRepository, TagRepository}
 import domain.support.entities.User
 import http.controllers.error.{APIError, BadRequest, NotFound}
 import http.presenter.stock.{PostStockRequest, StockResponse, StocksResponse}
 import shared.ddd.IdGenerator
 
-class StockService[F[_]: Monad: StockRepository](
+class StockService[F[_]: Monad: StockRepository: TagRepository](
   implicit val idGen: IdGenerator[String]
 ) {
   def getStocks(uid: String): F[Either[APIError, StocksResponse]] = {
@@ -31,11 +31,16 @@ class StockService[F[_]: Monad: StockRepository](
     res.value
   }
 
-  def postStock(req: PostStockRequest, uid: String): F[Either[APIError, StockResponse]] = {
+  def createStock(req: PostStockRequest, uid: String): F[Either[APIError, StockResponse]] = {
     val res = for {
-      stock <- EitherT(
-        StockRepository[F].save(req.toStockEntity(uid), req.toTagIdsEntity)
-      ).leftMap(e => BadRequest(e.getMessage): APIError)
+      tags <- EitherT.right[APIError](TagRepository[F].list(User.Id(uid)))
+      _ <- EitherT.fromEither[F](Either.cond(tags.map(_.id) == req.toTagIdsEntity, (), BadRequest("invalid tag ids")))
+      entity <- EitherT.right[APIError](
+        Monad.apply[F].pure(req.toStockEntity(uid)
+          .mergeTags(tags.filter(t => req.toTagIdsEntity.contains(t.id)))
+        ))
+      stock <- EitherT(StockRepository[F].save(entity))
+        .leftMap(e => BadRequest(e.getMessage): APIError)
     } yield StockResponse.fromEntity(stock)
 
     res.value

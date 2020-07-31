@@ -2,7 +2,6 @@ package gateway.slick.repositories
 
 import java.time.ZonedDateTime
 
-import cats._
 import cats.implicits._
 import cats.{Monad, ~>}
 import slick.dbio.DBIO
@@ -53,20 +52,19 @@ class StockRepositoryImpl[F[_]: Monad](
     execute.apply(res)
   }
 
-  override def save(stock: Stock, tagIds: Seq[Tag.Id] = Seq.empty[Tag.Id]): F[Either[FailedToSaveStock, Stock]] = {
+  override def save(stock: Stock): F[Either[FailedToSaveStock, Stock]] = {
     val res = (for {
       _ <- stocks += stock
-      _ <- stockTags ++= (for { id <- tagIds } yield StockTag(stock.id.value, id.value, ZonedDateTime.now()))
-      t <- tags.filter(_.id inSet tagIds.map(_.value)).result
-    } yield t).asTry.map {
-      case Success(tag) => stock.mergeTags(for (t <- tag) yield t).asRight
+      _ <- stockTags ++= (for { t <- stock.tags } yield StockTag(stock.id.value, t.id.value, ZonedDateTime.now()))
+    } yield stock).asTry.map {
+      case Success(tag) => stock.asRight
       case Failure(e) => FailedToSaveEntity[Stock](message = Option(e.getMessage)).asLeft
     }
 
     execute.apply(res)
   }
 
-  def delete(id: Stock.Id): F[Either[FailedToDeleteStock, Unit]] = {
+  override def delete(id: Stock.Id): F[Either[FailedToDeleteStock, Unit]] = {
     val res = stocks.filter(_.id === id.value).delete.asTry.map {
       case Success(_) => ().asRight
       case Failure(e) => FailedToDeleteEntity[Stock](message = Option(e.getMessage)).asLeft

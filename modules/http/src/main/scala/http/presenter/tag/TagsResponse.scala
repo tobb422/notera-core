@@ -1,4 +1,4 @@
-package http.presenter.stock
+package http.presenter.tag
 
 case class TagsResponse(
   tags: Seq[TagResponse]
