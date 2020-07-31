@@ -9,7 +9,7 @@ import org.http4s.circe._
 import domain.core.repositories.{StockRepository, TagRepository}
 import http.controllers.StockService
 import http.http4s.routes.error.ErrorHandling
-import http.presenter.stock.PostStockRequest
+import http.presenter.stock.{PostStockRequest, PutStockRequest}
 import org.http4s.dsl.Http4sDsl
 import shared.ddd.IdGenerator
 
@@ -21,6 +21,7 @@ class StockRoute[F[_]: Sync: ConcurrentEffect: StockRepository: TagRepository](
   private val errorHandling = new ErrorHandling[F]
 
   implicit val postDecoder: EntityDecoder[F, PostStockRequest] = jsonOf[F, PostStockRequest]
+  implicit val putDecoder: EntityDecoder[F, PutStockRequest] = jsonOf[F, PutStockRequest]
 
   val routes: HttpRoutes[F] = HttpRoutes.of[F] {
     case GET -> Root / "stocks" =>
@@ -39,6 +40,15 @@ class StockRoute[F[_]: Sync: ConcurrentEffect: StockRepository: TagRepository](
       (for {
         r <- req.as[PostStockRequest]
         stock <- service.createStock(r, tmpUid)
+      } yield stock).flatMap {
+        case Left(res) => errorHandling.toRoutes(res)
+        case Right(res) => Created(res.asJson)
+      }
+
+    case req @ PUT -> Root / "stocks" / id =>
+      (for {
+        r <- req.as[PutStockRequest]
+        stock <- service.updateStock(r, id, tmpUid)
       } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Created(res.asJson)

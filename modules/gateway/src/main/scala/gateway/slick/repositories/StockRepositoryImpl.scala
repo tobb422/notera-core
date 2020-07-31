@@ -52,12 +52,25 @@ class StockRepositoryImpl[F[_]: Monad](
     execute.apply(res)
   }
 
-  override def save(stock: Stock): F[Either[FailedToSaveStock, Stock]] = {
+  override def insert(stock: Stock): F[Either[FailedToSaveStock, Stock]] = {
     val res = (for {
       _ <- stocks += stock
       _ <- stockTags ++= (for { t <- stock.tags } yield StockTag(stock.id.value, t.id.value, ZonedDateTime.now()))
     } yield stock).asTry.map {
-      case Success(tag) => stock.asRight
+      case Success(_) => stock.asRight
+      case Failure(e) => FailedToSaveEntity[Stock](message = Option(e.getMessage)).asLeft
+    }
+
+    execute.apply(res)
+  }
+
+  override def update(stock: Stock): F[Either[FailedToSaveStock, Stock]] = {
+    val res = (for {
+      _ <- stocks.filter(_.id === stock.id.value).update(stock)
+      _ <- stockTags.filter(_.stockId === stock.id.value).delete
+      _ <- stockTags ++= (for { t <- stock.tags } yield StockTag(stock.id.value, t.id.value, ZonedDateTime.now()))
+    } yield  stock).asTry.map {
+      case Success(_) => stock.asRight
       case Failure(e) => FailedToSaveEntity[Stock](message = Option(e.getMessage)).asLeft
     }
 

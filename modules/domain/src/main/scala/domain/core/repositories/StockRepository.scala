@@ -11,7 +11,8 @@ trait StockRepository[F[_]] {
 
   def resolve(id: Stock.Id, uid: User.Id): F[Either[FailedToResolveByStockId, Stock]]
   def list(uid: User.Id): F[Seq[Stock]]
-  def save(value: Stock): F[Either[FailedToSaveStock, Stock]]
+  def insert(value: Stock): F[Either[FailedToSaveStock, Stock]]
+  def update(value: Stock): F[Either[FailedToSaveStock, Stock]]
   def delete(id: Stock.Id): F[Either[FailedToDeleteStock, Unit]]
 }
 
