@@ -2,8 +2,8 @@ package http.controllers
 
 import scala.util.Either
 import cats.Monad
-import domain.core.entities.Tag
 import cats.data.EitherT
+import domain.core.entities.Tag
 import domain.core.entities.Stock
 import domain.core.repositories.{StockRepository, TagRepository}
 import domain.support.entities.User
@@ -14,21 +14,13 @@ import shared.ddd.IdGenerator
 class StockService[F[_]: Monad: StockRepository: TagRepository](
   implicit val idGen: IdGenerator[String]
 ) {
-  def getStocks(uid: String): F[Either[APIError, StocksResponse]] = {
-    val res = for {
-      stocks <- EitherT.right[APIError](StockRepository[F].list(User.Id(uid)))
-    } yield StocksResponse(stocks.map(StockResponse.fromEntity))
+  def getStocks(uid: String): F[Either[APIError, StocksResponse]] =
+    EitherT.right[APIError](StockRepository[F].list(User.Id(uid)))
+      .map(stocks => StocksResponse(stocks.map(StockResponse.fromEntity))).value
 
-    res.value
-  }
-
-  def getStock(id: String, uid: String): F[Either[APIError, StockResponse]] = {
-    val res = for {
-      stock <- EitherT(find(id, uid)).leftMap(e => NotFound(e.getMessage): APIError)
-    } yield StockResponse.fromEntity(stock)
-
-    res.value
-  }
+  def getStock(id: String, uid: String): F[Either[APIError, StockResponse]] =
+    EitherT(find(id, uid)).leftMap(e => NotFound(e.getMessage): APIError)
+      .map(StockResponse.fromEntity).value
 
   def createStock(req: PostStockRequest, uid: String): F[Either[APIError, StockResponse]] = {
     val res = for {
@@ -60,24 +52,17 @@ class StockService[F[_]: Monad: StockRepository: TagRepository](
     res.value
   }
 
-  def deleteStock(id: String): F[Either[APIError, Unit]] = {
-    val res = for {
-      _ <- EitherT(
-        StockRepository[F].delete(Stock.Id(id))
-      ).leftMap(e => BadRequest(e.getMessage): APIError)
-    } yield ()
-
-    res.value
-  }
+  def deleteStock(id: String): F[Either[APIError, Unit]] =
+    EitherT(StockRepository[F].delete(Stock.Id(id)))
+      .leftMap(e => BadRequest(e.getMessage): APIError).value
 
   private def find(id: String, uid: String) =
     StockRepository[F].resolve(Stock.Id(id), User.Id(uid))
 
-  private def containsTag(targets: Seq[Tag.Id], tags: Seq[Tag.Id]): Either[APIError, Unit] = {
+  private def containsTag(targets: Seq[Tag.Id], tags: Seq[Tag.Id]): Either[APIError, Unit] =
     if (targets.isEmpty) {
       Right(())
     } else {
       Either.cond(targets.toSet subsetOf tags.toSet, (), BadRequest("invalid tag ids"))
     }
-  }
 }
