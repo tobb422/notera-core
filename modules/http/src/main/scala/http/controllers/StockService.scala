@@ -22,8 +22,8 @@ class StockService[F[_]: Monad: StockRepository: TagRepository](
     EitherT(find(id, uid)).leftMap(e => NotFound(e.getMessage): APIError)
       .map(StockResponse.fromEntity).value
 
-  def createStock(req: PostStockRequest, uid: String): F[Either[APIError, StockResponse]] = {
-    val res = for {
+  def createStock(req: PostStockRequest, uid: String): F[Either[APIError, StockResponse]] =
+    (for {
       tags <- EitherT.right[APIError](TagRepository[F].list(User.Id(uid)))
       _ <- EitherT.fromEither[F](containsTag(req.toTagIdsEntity, tags.map(_.id)))
       entity <- EitherT.right[APIError](
@@ -32,13 +32,11 @@ class StockService[F[_]: Monad: StockRepository: TagRepository](
         ))
       stock <- EitherT(StockRepository[F].insert(entity))
         .leftMap(e => BadRequest(e.getMessage): APIError)
-    } yield StockResponse.fromEntity(stock)
+        .map(StockResponse.fromEntity)
+    } yield stock).value
 
-    res.value
-  }
-
-  def updateStock(req: PutStockRequest, id: String, uid: String): F[Either[APIError, StockResponse]] = {
-    val res = for {
+  def updateStock(req: PutStockRequest, id: String, uid: String): F[Either[APIError, StockResponse]] =
+    (for {
       tags <- EitherT.right[APIError](TagRepository[F].list(User.Id(uid)))
       _ <- EitherT.fromEither[F](containsTag(req.toTagIdsEntity, tags.map(_.id)))
       target <- EitherT(find(id, uid)).leftMap(e => NotFound(e.getMessage): APIError)
@@ -47,10 +45,8 @@ class StockService[F[_]: Monad: StockRepository: TagRepository](
           .copy(tags = req.tagIds.getOrElse(target.tags).map(t => tags.find(_.id.value == t).get))))
       stock <- EitherT(StockRepository[F].update(entity))
         .leftMap(e => BadRequest(e.getMessage): APIError)
-    } yield StockResponse.fromEntity(stock)
-
-    res.value
-  }
+          .map(StockResponse.fromEntity)
+    } yield stock).value
 
   def deleteStock(id: String): F[Either[APIError, Unit]] =
     EitherT(StockRepository[F].delete(Stock.Id(id)))

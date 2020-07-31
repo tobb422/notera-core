@@ -51,7 +51,7 @@ class StockRoute[F[_]: Sync: ConcurrentEffect: StockRepository: TagRepository](
         stock <- service.updateStock(r, id, tmpUid)
       } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
-        case Right(res) => Created(res.asJson)
+        case Right(res) => Ok(res.asJson)
       }
 
     case DELETE -> Root / "stocks" / id =>

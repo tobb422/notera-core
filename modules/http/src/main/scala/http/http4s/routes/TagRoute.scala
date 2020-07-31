@@ -9,7 +9,7 @@ import org.http4s.circe._
 import domain.core.repositories.TagRepository
 import http.controllers.TagService
 import http.http4s.routes.error.ErrorHandling
-import http.presenter.tag.PostTagRequest
+import http.presenter.tag.{PostTagRequest, PutTagRequest}
 import org.http4s.EntityDecoder
 import org.http4s.dsl.Http4sDsl
 import shared.ddd.IdGenerator
@@ -21,7 +21,8 @@ class TagRoute[F[_]: Sync: ConcurrentEffect: TagRepository](
   private val service = new TagService[F]
   private val errorHandling = new ErrorHandling[F]
 
-  implicit val decoder: EntityDecoder[F, PostTagRequest] = jsonOf[F, PostTagRequest]
+  implicit val postDdecoder: EntityDecoder[F, PostTagRequest] = jsonOf[F, PostTagRequest]
+  implicit val putDecoder: EntityDecoder[F, PutTagRequest] = jsonOf[F, PutTagRequest]
 
   val routes: HttpRoutes[F] = HttpRoutes.of[F] {
     case GET -> Root / "tags" =>
@@ -37,14 +38,21 @@ class TagRoute[F[_]: Sync: ConcurrentEffect: TagRepository](
       }
 
     case req @ POST -> Root / "tag" =>
-      val result = for {
+      (for {
         r <- req.as[PostTagRequest]
-        stock <- service.postTag(r, tmpUid)
-      } yield stock
-
-      result.flatMap {
+        stock <- service.createTag(r, tmpUid)
+      } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Created(res.asJson)
+      }
+
+    case req @ PUT -> Root / "tags" / id =>
+      (for {
+        r <- req.as[PutTagRequest]
+        stock <- service.updateTag(r, id, tmpUid)
+      } yield stock).flatMap {
+        case Left(res) => errorHandling.toRoutes(res)
+        case Right(res) => Ok(res.asJson)
       }
 
     case DELETE -> Root / "tags" / id =>
