@@ -27,7 +27,7 @@ class StockService[F[_]: Monad: StockRepository: TagRepository](
       tags <- EitherT.right[APIError](TagRepository[F].list(User.Id(uid)))
       _ <- EitherT.fromEither[F](containsTag(req.toTagIdsEntity, tags.map(_.id)))
       entity <- EitherT.right[APIError](
-        Monad.apply[F].pure(req.toStockEntity(uid)
+        Monad[F].pure(req.toStockEntity(uid)
           .mergeTags(tags.filter(t => req.toTagIdsEntity.contains(t.id)))
         ))
       stock <- EitherT(StockRepository[F].insert(entity))
@@ -41,7 +41,7 @@ class StockService[F[_]: Monad: StockRepository: TagRepository](
       _ <- EitherT.fromEither[F](containsTag(req.toTagIdsEntity, tags.map(_.id)))
       target <- EitherT(find(id, uid)).leftMap(e => NotFound(e.getMessage): APIError)
       entity <- EitherT.right[APIError](
-        Monad.apply[F].pure(req.updateItem(target)
+        Monad[F].pure(req.updateItem(target)
           .copy(tags = req.tagIds.getOrElse(target.tags).map(t => tags.find(_.id.value == t).get))))
       stock <- EitherT(StockRepository[F].update(entity))
         .leftMap(e => BadRequest(e.getMessage): APIError)

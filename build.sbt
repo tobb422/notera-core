@@ -27,7 +27,8 @@ lazy val gateway = (project in file("modules/gateway"))
       Slick.slick,
       Slick.slickHikariCP,
       Slick.slf4j,
-      Slick.pg
+      Slick.pg,
+      FireBase.admin
     )
   )
   .settings(coreSettings)

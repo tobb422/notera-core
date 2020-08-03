@@ -6,10 +6,12 @@ import domain.Repositories
 import org.http4s.implicits._
 import org.http4s.Header
 import org.http4s.server.blaze.BlazeServerBuilder
+import shared.auth.TokenVerifier
 import shared.ddd.IdGenerator
 
 class Http4sServer[F[_]: ContextShift: ConcurrentEffect: Timer: Repositories](
-  implicit idGen: IdGenerator[String]
+  implicit idGen: IdGenerator[String],
+  tokenVerifier: TokenVerifier,
 ) extends http.Server[F] {
   override def serve(host: String, port: Int): F[_] = {
     val services =

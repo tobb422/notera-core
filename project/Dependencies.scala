@@ -39,3 +39,7 @@ object Slick {
   val slf4j = "org.slf4j" % "slf4j-nop" % "1.6.4"
   val pg = "org.postgresql" % "postgresql" % "42.2.5"
 }
+
+object FireBase {
+  val admin = "com.google.firebase" % "firebase-admin" % "4.0.3"
+}

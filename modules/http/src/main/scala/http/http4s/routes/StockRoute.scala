@@ -7,6 +7,7 @@ import io.circe.syntax._
 import org.http4s._
 import org.http4s.circe._
 import domain.core.repositories.{StockRepository, TagRepository}
+import domain.support.entities.User
 import http.controllers.StockService
 import http.http4s.routes.error.ErrorHandling
 import http.presenter.stock.{PostStockRequest, PutStockRequest}
@@ -16,45 +17,44 @@ import shared.ddd.IdGenerator
 class StockRoute[F[_]: Sync: ConcurrentEffect: StockRepository: TagRepository](
   implicit val idGen: IdGenerator[String]
 ) extends Http4sDsl[F] {
-  private val tmpUid = "uid01234567890uid123456789"
   private val service = new StockService[F]
   private val errorHandling = new ErrorHandling[F]
 
   implicit val postDecoder: EntityDecoder[F, PostStockRequest] = jsonOf[F, PostStockRequest]
   implicit val putDecoder: EntityDecoder[F, PutStockRequest] = jsonOf[F, PutStockRequest]
 
-  val routes: HttpRoutes[F] = HttpRoutes.of[F] {
-    case GET -> Root / "stocks" =>
-      service.getStocks(tmpUid).flatMap {
+  val routes: AuthedRoutes[User, F] = AuthedRoutes.of[User, F] {
+    case GET -> Root / "stocks" as user =>
+      service.getStocks(user.id.value).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
 
-    case GET -> Root / "stocks" / id =>
-      service.getStock(id, tmpUid).flatMap {
+    case GET -> Root / "stocks" / id as user =>
+      service.getStock(id, user.id.value).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
 
-    case req @ POST -> Root / "stock" =>
+    case authReq @ POST -> Root / "stock" as user =>
       (for {
-        r <- req.as[PostStockRequest]
-        stock <- service.createStock(r, tmpUid)
+        r <- authReq.req.as[PostStockRequest]
+        stock <- service.createStock(r, user.id.value)
       } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Created(res.asJson)
       }
 
-    case req @ PUT -> Root / "stocks" / id =>
+    case authReq @ PUT -> Root / "stocks" / id as user =>
       (for {
-        r <- req.as[PutStockRequest]
-        stock <- service.updateStock(r, id, tmpUid)
+        r <- authReq.req.as[PutStockRequest]
+        stock <- service.updateStock(r, id, user.id.value)
       } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
 
-    case DELETE -> Root / "stocks" / id =>
+    case DELETE -> Root / "stocks" / id as _ =>
       service.deleteStock(id).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(_) => NoContent()
