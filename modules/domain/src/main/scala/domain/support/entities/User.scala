@@ -6,6 +6,7 @@ import shared.ddd.{Entity, IdGenerator, Identifier}
 
 case class User (
   id: User.Id,
+  uid: String,
   createdAt: ZonedDateTime,
   updatedAt: ZonedDateTime
 ) extends Entity {
@@ -20,4 +21,11 @@ object User {
     protected[User] def getNextId()(implicit idGen: IdGenerator[String]): Id =
       Id(idGen.generate())
   }
+
+  def from(uid: String)(implicit idGen: IdGenerator[String]): User = User(
+    id = Id.getNextId(),
+    uid = uid,
+    createdAt = ZonedDateTime.now(),
+    updatedAt = ZonedDateTime.now()
+  )
 }
