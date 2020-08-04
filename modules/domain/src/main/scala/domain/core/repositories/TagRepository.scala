@@ -12,7 +12,7 @@ trait TagRepository[F[_]] {
   def resolve(id: Tag.Id, uid: User.Id): F[Either[FailedToResolveByTagId, Tag]]
   def list(uid: User.Id): F[Seq[Tag]]
   def save(value: Tag): F[Either[FailedToSaveTag, Tag]]
-  def delete(id: Tag.Id): F[Either[FailedToDeleteTag, Unit]]
+  def delete(id: Tag.Id, uid: User.Id): F[Either[FailedToDeleteTag, Unit]]
 }
 
 object TagRepository {

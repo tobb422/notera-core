@@ -43,8 +43,8 @@ class NoteRepositoryImpl[F[_]](
     execute.apply(res)
   }
 
-  override def delete(id: Note.Id): F[Either[FailedToDeleteNote, Unit]] = {
-    val res = notes.filter(_.id === id.value).delete.asTry.map {
+  override def delete(id: Note.Id, uid: User.Id): F[Either[FailedToDeleteNote, Unit]] = {
+    val res = notes.filter(n => n.id === id.value && n.userId === uid.value).delete.asTry.map {
       case Success(_) => ().asRight
       case Failure(e) => FailedToDeleteEntity[Note](message = Option(e.getMessage)).asLeft
     }

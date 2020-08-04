@@ -77,8 +77,8 @@ class StockRepositoryImpl[F[_]](
     execute.apply(res)
   }
 
-  override def delete(id: Stock.Id): F[Either[FailedToDeleteStock, Unit]] = {
-    val res = stocks.filter(_.id === id.value).delete.asTry.map {
+  override def delete(id: Stock.Id, uid: User.Id): F[Either[FailedToDeleteStock, Unit]] = {
+    val res = stocks.filter(s => s.id === id.value && s.userId === uid.value).delete.asTry.map {
       case Success(_) => ().asRight
       case Failure(e) => FailedToDeleteEntity[Stock](message = Option(e.getMessage)).asLeft
     }

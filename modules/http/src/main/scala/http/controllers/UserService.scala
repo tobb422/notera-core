@@ -12,8 +12,8 @@ class UserService[F[_]: Monad: UserRepository](
   implicit val idGen: IdGenerator[String]
 ) {
 
-  def getUser(id: String): F[Either[APIError, UserResponse]] =
-    EitherT(UserRepository[F].resolve(User.Id(id)))
+  def getUser(id: User.Id): F[Either[APIError, UserResponse]] =
+    EitherT(UserRepository[F].resolve(id))
       .leftMap(e => NotFound(e.getMessage): APIError)
       .map(UserResponse.fromEntity).value
 

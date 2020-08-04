@@ -2,6 +2,7 @@ package http.http4s.routes
 
 import cats.effect._
 import cats.implicits._
+import domain.core.entities.Stock
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s._
@@ -25,13 +26,13 @@ class StockRoute[F[_]: Sync: ConcurrentEffect: StockRepository: TagRepository](
 
   val routes: AuthedRoutes[User, F] = AuthedRoutes.of[User, F] {
     case GET -> Root / "stocks" as user =>
-      service.getStocks(user.id.value).flatMap {
+      service.getStocks(user.id).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
 
     case GET -> Root / "stocks" / id as user =>
-      service.getStock(id, user.id.value).flatMap {
+      service.getStock(Stock.Id(id), user.id).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
@@ -39,7 +40,7 @@ class StockRoute[F[_]: Sync: ConcurrentEffect: StockRepository: TagRepository](
     case authReq @ POST -> Root / "stock" as user =>
       (for {
         r <- authReq.req.as[PostStockRequest]
-        stock <- service.createStock(r, user.id.value)
+        stock <- service.createStock(r, user.id)
       } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Created(res.asJson)
@@ -48,14 +49,14 @@ class StockRoute[F[_]: Sync: ConcurrentEffect: StockRepository: TagRepository](
     case authReq @ PUT -> Root / "stocks" / id as user =>
       (for {
         r <- authReq.req.as[PutStockRequest]
-        stock <- service.updateStock(r, id, user.id.value)
+        stock <- service.updateStock(r, Stock.Id(id), user.id)
       } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
 
-    case DELETE -> Root / "stocks" / id as _ =>
-      service.deleteStock(id).flatMap {
+    case DELETE -> Root / "stocks" / id as user =>
+      service.deleteStock(Stock.Id(id), user.id).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(_) => NoContent()
       }

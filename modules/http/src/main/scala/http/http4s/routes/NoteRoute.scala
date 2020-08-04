@@ -56,8 +56,8 @@ class NoteRoute[F[_]: Sync: ConcurrentEffect: NoteRepository](
         case Right(res) => Ok(res.asJson)
       }
 
-    case DELETE -> Root / "memos" / id as _ =>
-      service.deleteNote(Note.Id(id)).flatMap {
+    case DELETE -> Root / "memos" / id as user =>
+      service.deleteNote(Note.Id(id), user.id).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(_) => NoContent()
       }

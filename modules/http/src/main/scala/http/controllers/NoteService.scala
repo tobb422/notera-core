@@ -34,7 +34,7 @@ class NoteService[F[_]: Monad: NoteRepository](
         .map(NoteResponse.fromEntity)
     } yield note).value
 
-  def deleteNote(id: Note.Id): F[Either[APIError, Unit]] =
-    EitherT(NoteRepository[F].delete(id))
+  def deleteNote(id: Note.Id, uid: User.Id): F[Either[APIError, Unit]] =
+    EitherT(NoteRepository[F].delete(id, uid))
       .leftMap(e => BadRequest(e.getMessage): APIError).value
 }

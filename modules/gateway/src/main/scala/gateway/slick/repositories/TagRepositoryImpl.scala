@@ -42,8 +42,8 @@ class TagRepositoryImpl[F[_]: Monad](
     execute.apply(res)
   }
 
-  def delete(id: DTag.Id): F[Either[FailedToDeleteTag, Unit]] = {
-    val res = tags.filter(_.id === id.value).delete.asTry.map {
+  def delete(id: DTag.Id, uid: User.Id): F[Either[FailedToDeleteTag, Unit]] = {
+    val res = tags.filter(t => t.id === id.value && t.userId === uid.value).delete.asTry.map {
       case Success(_) => ().asRight
       case Failure(e) => FailedToDeleteEntity[DTag](message = Option(e.getMessage)).asLeft
     }

@@ -14,17 +14,18 @@ import shared.ddd.IdGenerator
 class StockService[F[_]: Monad: StockRepository: TagRepository](
   implicit val idGen: IdGenerator[String]
 ) {
-  def getStocks(uid: String): F[Either[APIError, StocksResponse]] =
-    EitherT.right[APIError](StockRepository[F].list(User.Id(uid)))
+  def getStocks(uid: User.Id): F[Either[APIError, StocksResponse]] =
+    EitherT.right[APIError](StockRepository[F].list(uid))
       .map(stocks => StocksResponse(stocks.map(StockResponse.fromEntity))).value
 
-  def getStock(id: String, uid: String): F[Either[APIError, StockResponse]] =
-    EitherT(find(id, uid)).leftMap(e => NotFound(e.getMessage): APIError)
+  def getStock(id: Stock.Id, uid: User.Id): F[Either[APIError, StockResponse]] =
+    EitherT(find(id, uid))
+      .leftMap(e => NotFound(e.getMessage): APIError)
       .map(StockResponse.fromEntity).value
 
-  def createStock(req: PostStockRequest, uid: String): F[Either[APIError, StockResponse]] =
+  def createStock(req: PostStockRequest, uid: User.Id): F[Either[APIError, StockResponse]] =
     (for {
-      tags <- EitherT.right[APIError](TagRepository[F].list(User.Id(uid)))
+      tags <- EitherT.right[APIError](TagRepository[F].list(uid))
       _ <- EitherT.fromEither[F](containsTag(req.toTagIdsEntity, tags.map(_.id)))
       entity <- EitherT.right[APIError](
         Monad[F].pure(req.toStockEntity(uid)
@@ -35,9 +36,9 @@ class StockService[F[_]: Monad: StockRepository: TagRepository](
         .map(StockResponse.fromEntity)
     } yield stock).value
 
-  def updateStock(req: PutStockRequest, id: String, uid: String): F[Either[APIError, StockResponse]] =
+  def updateStock(req: PutStockRequest, id: Stock.Id, uid: User.Id): F[Either[APIError, StockResponse]] =
     (for {
-      tags <- EitherT.right[APIError](TagRepository[F].list(User.Id(uid)))
+      tags <- EitherT.right[APIError](TagRepository[F].list(uid))
       _ <- EitherT.fromEither[F](containsTag(req.toTagIdsEntity, tags.map(_.id)))
       target <- EitherT(find(id, uid)).leftMap(e => NotFound(e.getMessage): APIError)
       entity <- EitherT.right[APIError](
@@ -48,12 +49,12 @@ class StockService[F[_]: Monad: StockRepository: TagRepository](
           .map(StockResponse.fromEntity)
     } yield stock).value
 
-  def deleteStock(id: String): F[Either[APIError, Unit]] =
-    EitherT(StockRepository[F].delete(Stock.Id(id)))
+  def deleteStock(id: Stock.Id, uid: User.Id): F[Either[APIError, Unit]] =
+    EitherT(StockRepository[F].delete(id, uid))
       .leftMap(e => BadRequest(e.getMessage): APIError).value
 
-  private def find(id: String, uid: String) =
-    StockRepository[F].resolve(Stock.Id(id), User.Id(uid))
+  private def find(id: Stock.Id, uid: User.Id) =
+    StockRepository[F].resolve(id, uid)
 
   private def containsTag(targets: Seq[Tag.Id], tags: Seq[Tag.Id]): Either[APIError, Unit] =
     if (targets.isEmpty) {

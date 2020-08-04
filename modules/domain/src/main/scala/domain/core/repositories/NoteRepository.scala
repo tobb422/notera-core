@@ -13,7 +13,7 @@ trait NoteRepository[F[_]] {
   def resolve(id: Note.Id, uid: User.Id): F[Either[FailedToResolveByNoteId, Note]]
   def resolveByStockId(sid: Stock.Id, uid: User.Id): F[Seq[Note]]
   def save(value: Note): F[Either[FailedToSaveNote, Note]]
-  def delete(id: Note.Id): F[Either[FailedToDeleteNote, Unit]]
+  def delete(id: Note.Id, uid: User.Id): F[Either[FailedToDeleteNote, Unit]]
 }
 
 object NoteRepository {

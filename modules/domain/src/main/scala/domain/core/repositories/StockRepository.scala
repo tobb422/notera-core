@@ -13,7 +13,7 @@ trait StockRepository[F[_]] {
   def list(uid: User.Id): F[Seq[Stock]]
   def insert(value: Stock): F[Either[FailedToSaveStock, Stock]]
   def update(value: Stock): F[Either[FailedToSaveStock, Stock]]
-  def delete(id: Stock.Id): F[Either[FailedToDeleteStock, Unit]]
+  def delete(id: Stock.Id, uid: User.Id): F[Either[FailedToDeleteStock, Unit]]
 }
 
 object StockRepository {

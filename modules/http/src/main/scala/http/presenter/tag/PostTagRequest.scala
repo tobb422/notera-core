@@ -8,6 +8,6 @@ case class PostTagRequest(
   name: String,
   color: String
 )(implicit idGen: IdGenerator[String]) {
-  def toEntity(uid: String): Tag =
-    Tag.from(User.Id(uid), name, color)
+  def toEntity(uid: User.Id): Tag =
+    Tag.from(uid, name, color)
 }

@@ -11,8 +11,8 @@ case class PostStockRequest(
   image: String,
   tagIds: Seq[String]
 )(implicit idGen: IdGenerator[String]) {
-  def toStockEntity(uid: String): Stock =
-    Stock.from(User.Id(uid), StockItem(title, Url(url), Url(image)))
+  def toStockEntity(uid: User.Id): Stock =
+    Stock.from(uid, StockItem(title, Url(url), Url(image)))
 
   def toTagIdsEntity: Seq[Tag.Id] = tagIds.map(Tag.Id(_))
 }

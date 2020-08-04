@@ -2,6 +2,7 @@ package http.http4s.routes
 
 import cats.effect._
 import cats.implicits._
+import domain.core.entities.Tag
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s._
@@ -26,13 +27,13 @@ class TagRoute[F[_]: Sync: ConcurrentEffect: TagRepository](
 
   val routes: AuthedRoutes[User, F] = AuthedRoutes.of[User, F] {
     case GET -> Root / "tags" as user =>
-      service.getTags(user.id.value).flatMap {
+      service.getTags(user.id).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
 
     case GET -> Root / "tags" / id as user =>
-      service.getTag(id, user.id.value).flatMap {
+      service.getTag(Tag.Id(id), user.id).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
@@ -40,7 +41,7 @@ class TagRoute[F[_]: Sync: ConcurrentEffect: TagRepository](
     case authReq @ POST -> Root / "tag" as user =>
       (for {
         r <- authReq.req.as[PostTagRequest]
-        stock <- service.createTag(r, user.id.value)
+        stock <- service.createTag(r, user.id)
       } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Created(res.asJson)
@@ -49,14 +50,14 @@ class TagRoute[F[_]: Sync: ConcurrentEffect: TagRepository](
     case authReq @ PUT -> Root / "tags" / id as user =>
       (for {
         r <- authReq.req.as[PutTagRequest]
-        stock <- service.updateTag(r, id, user.id.value)
+        stock <- service.updateTag(r, Tag.Id(id), user.id)
       } yield stock).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(res) => Ok(res.asJson)
       }
 
-    case DELETE -> Root / "tags" / id as _ =>
-      service.deleteTag(id).flatMap {
+    case DELETE -> Root / "tags" / id as user =>
+      service.deleteTag(Tag.Id(id), user.id).flatMap {
         case Left(res) => errorHandling.toRoutes(res)
         case Right(_) => NoContent()
       }
