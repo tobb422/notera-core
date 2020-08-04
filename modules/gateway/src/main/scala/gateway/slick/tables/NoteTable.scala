@@ -3,18 +3,18 @@ package gateway.slick.tables
 import java.sql.Timestamp
 import java.time.ZoneId
 
-import domain.core.entities.{Memo, Stock}
+import domain.core.entities.{Note, Stock}
 import domain.support.entities.User
 import gateway.slick.SlickTable
 import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
 
-protected[slick] class MemoTable(val jdbcProfile: JdbcProfile) extends SlickTable {
+protected[slick] class NoteTable(val jdbcProfile: JdbcProfile) extends SlickTable {
   import jdbcProfile.api._
 
-  override val tableName: String = "memos"
+  override val tableName: String = "notes"
 
-  class Schema(tag: Tag) extends Table[Memo](tag, tableName) {
+  class Schema(tag: Tag) extends Table[Note](tag, tableName) {
     def id = column[String]("id", O.PrimaryKey)
     def userId = column[String]("user_id")
     def stockId = column[String]("stock_id")
@@ -22,12 +22,12 @@ protected[slick] class MemoTable(val jdbcProfile: JdbcProfile) extends SlickTabl
     def createdAt = column[Timestamp]("created_at")
     def updatedAt = column[Timestamp]("updated_at")
 
-    def * : ProvenShape[Memo] =
+    def * : ProvenShape[Note] =
       (id, userId, stockId, content, createdAt, updatedAt) <> (
         {
           case (id, userId, stockId, content, createdAt, updatedAt) =>
-            new Memo(
-              Memo.Id(id),
+            new Note(
+              Note.Id(id),
               User.Id(userId),
               Stock.Id(stockId),
               content,
@@ -36,7 +36,7 @@ protected[slick] class MemoTable(val jdbcProfile: JdbcProfile) extends SlickTabl
             )
         },
         {
-          m: Memo =>
+          m: Note =>
             Some(
               (
                 m.id.value,

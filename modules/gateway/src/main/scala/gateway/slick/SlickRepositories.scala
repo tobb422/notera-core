@@ -8,7 +8,7 @@ import gateway.slick.repositories._
 
 import scala.concurrent.ExecutionContext
 
-class SlickRepositories[F[_]: Monad: DatabaseProvider] extends Repositories[F] {
+class SlickRepositories[F[_] : Monad : DatabaseProvider] extends Repositories[F] {
   private val provider = implicitly[DatabaseProvider[F]]
   implicit private val context: ExecutionContext = provider.context
 
@@ -18,4 +18,6 @@ class SlickRepositories[F[_]: Monad: DatabaseProvider] extends Repositories[F] {
     new TagRepositoryImpl[F](provider.profile, provider.transformation)
   override implicit val userRepository: UserRepository[F] =
     new UserRepositoryImpl[F](provider.profile, provider.transformation)
+  override implicit val noteRepository: _root_.domain.core.repositories.NoteRepository[F] =
+    new NoteRepositoryImpl[F](provider.profile, provider.transformation)
 }

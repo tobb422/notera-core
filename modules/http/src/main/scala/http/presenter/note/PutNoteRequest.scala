@@ -1,14 +1,14 @@
-package http.presenter.memo
+package http.presenter.note
 
 import java.time.ZonedDateTime
 
-import domain.core.entities.{Memo, Stock}
+import domain.core.entities.{Note, Stock}
 
-case class PutMemoRequest(
+case class PutNoteRequest(
   stockId: Stock.Id,
   content: String
 ) {
-  def update(memo: Memo): Memo =
+  def update(memo: Note): Note =
     memo.copy(
       id = memo.id,
       stockId = memo.stockId,

@@ -10,7 +10,7 @@ import http.auth
 import http.controllers.error.{APIError, Forbidden}
 import http.http4s.routes.error.ErrorHandling
 import org.http4s._
-import http.http4s.routes.{MemoRoute, StockRoute, TagRoute, UserRoute}
+import http.http4s.routes.{NoteRoute, StockRoute, TagRoute, UserRoute}
 import org.http4s.headers.Authorization
 import org.http4s.server.AuthMiddleware
 import shared.auth.TokenVerifier
@@ -39,7 +39,7 @@ class Http4sService[F[_]: Monad: ConcurrentEffect: Repositories](
   private val stock = new StockRoute[F]
   private val tag = new TagRoute[F]
   private val user = new UserRoute[F]
-  private val memo = new MemoRoute[F]
+  private val note = new NoteRoute[F]
 
-  val routes: HttpRoutes[F] = middleware(stock.routes <+> tag.routes <+> memo.routes) <+> user.routes
+  val routes: HttpRoutes[F] = middleware(stock.routes <+> tag.routes <+> note.routes) <+> user.routes
 }

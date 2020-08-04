@@ -1,10 +1,10 @@
-package http.presenter.memo
+package http.presenter.note
 
 import java.time.ZonedDateTime
 
-import domain.core.entities.Memo
+import domain.core.entities.Note
 
-case class MemoResponse(
+case class NoteResponse(
   id: String,
   userId: String,
   stockId: String,
@@ -13,8 +13,8 @@ case class MemoResponse(
   updatedAt: ZonedDateTime
 )
 
-object MemoResponse {
-  def fromEntity(memo: Memo): MemoResponse = MemoResponse(
+object NoteResponse {
+  def fromEntity(memo: Note): NoteResponse = NoteResponse(
     memo.id.value,
     memo.userId.value,
     memo.stockId.value,

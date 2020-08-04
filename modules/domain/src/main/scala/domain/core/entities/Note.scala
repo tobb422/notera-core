@@ -5,27 +5,27 @@ import java.time.ZonedDateTime
 import domain.support.entities.User
 import shared.ddd.{Entity, IdGenerator, Identifier}
 
-case class Memo(
-  id: Memo.Id,
+case class Note(
+  id: Note.Id,
   userId: User.Id,
   stockId: Stock.Id,
   content: String,
   createdAt: ZonedDateTime,
   updatedAt: ZonedDateTime
 ) extends Entity {
-  override type Id = Memo.Id
+  override type Id = Note.Id
 }
 
-object Memo {
+object Note {
   case class Id(value: String) extends Identifier {
     override type IdType = String
   }
   object Id {
-    protected[Memo] def getNextId()(implicit idGen: IdGenerator[String]): Id =
+    protected[Note] def getNextId()(implicit idGen: IdGenerator[String]): Id =
       Id(idGen.generate())
   }
 
-  def from(uid: User.Id, sid: Stock.Id, content: String)(implicit idGen: IdGenerator[String]): Memo = Memo(
+  def from(uid: User.Id, sid: Stock.Id, content: String)(implicit idGen: IdGenerator[String]): Note = Note(
     id = Id.getNextId(),
     userId = uid,
     stockId = sid,
