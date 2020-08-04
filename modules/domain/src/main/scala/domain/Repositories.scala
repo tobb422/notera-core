@@ -7,4 +7,5 @@ trait Repositories[F[_]] {
   implicit val stockRepository: StockRepository[F]
   implicit val tagRepository: TagRepository[F]
   implicit val userRepository: UserRepository[F]
+  implicit val memoRepository: MemoRepository[F]
 }

@@ -15,15 +15,17 @@ protected[slick] class UserTable(val jdbcProfile: JdbcProfile) extends SlickTabl
 
   class Schema(tag: Tag) extends Table[User](tag, tableName) {
     def id = column[String]("id", O.PrimaryKey)
+    def uid = column[String]("uid")
     def createdAt = column[Timestamp]("created_at")
     def updatedAt = column[Timestamp]("updated_at")
 
     def * : ProvenShape[User] =
-      (id, createdAt, updatedAt) <> (
+      (id, uid, createdAt, updatedAt) <> (
         {
-          case (id, createdAt, updatedAt) =>
+          case (id, uid, createdAt, updatedAt) =>
             new User(
               User.Id(id),
+              uid,
               createdAt.toLocalDateTime.atZone(ZoneId.of("Asia/Tokyo")),
               updatedAt.toLocalDateTime.atZone(ZoneId.of("Asia/Tokyo"))
             )
@@ -33,6 +35,7 @@ protected[slick] class UserTable(val jdbcProfile: JdbcProfile) extends SlickTabl
             Some(
               (
                 t.id.value,
+                t.uid,
                 Timestamp.valueOf(t.createdAt.toLocalDateTime),
                 Timestamp.valueOf(t.updatedAt.toLocalDateTime)
               )

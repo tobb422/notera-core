@@ -3,7 +3,7 @@ package gateway.slick.repositories
 import java.time.ZonedDateTime
 
 import cats.implicits._
-import cats.{Monad, ~>}
+import cats.~>
 import slick.dbio.DBIO
 import slick.jdbc.JdbcProfile
 import domain.core.entities._
@@ -14,7 +14,7 @@ import shared.ddd.{FailedToDeleteEntity, FailedToResolveById, FailedToSaveEntity
 
 import scala.util.{Failure, Success}
 
-class StockRepositoryImpl[F[_]: Monad](
+class StockRepositoryImpl[F[_]](
   jdbcProfile: JdbcProfile,
   execute: DBIO ~> F
 )(implicit ec: scala.concurrent.ExecutionContext) extends StockRepository[F] {
